@@ -1,20 +1,24 @@
 import { LOG } from './../../_shared/log/log';
-import type { WORKSHOP_BASE, WORKSHOP_ITEM } from './workshop.d';
+import type { WORKSHOP, WORKSHOP_BASE, WORKSHOP_ITEM } from './workshop.d';
 import  { command } from '../../_shared/cmd/cmd';
-import { removeHtmlTags } from '../../_shared/sanitize/sanitize';
-import { getDays, IDS } from './workshop.config';
-import { getDateDetail, getImages, getDateParts, getParts, getDaysFromCategory, getYearFromCategory } from '../../_shared/parse/parse';
+import { getKey, getStrValue } from '../../_shared/sanitize/sanitize';
+import { IDS } from './workshop.config';
+import type { DATE } from '../../_shared/parse/parse.d';
+import { getImages, getDateParts, getParts, getDescription, getLinks, getAuthors, getTime, getDates, getVenue, getWeekDays } from '../../_shared/parse/parse';
 const HTMLParser = require('node-html-parser');
 
-const DAYS = getDays();
-
-export const getWorkshopDetails = (url: string, base: WORKSHOP_BASE) => {
+export const getWorkshopDetails = (workshop: WORKSHOP, id: number, all: number) => {
+    const url = workshop.href;
     const html = command(`curl -s ${url}`);
-    LOG.DEBUG(url);
-    return analyzeWorkshopPage(html, base);
+    if(html.length > 10){
+        LOG.OK(`[${id}/${all}] ${url}`);
+    } else {
+        LOG.FAIL(`[${id}/${all}] ${url}`);
+    }
+    return analyzeWorkshopPage(html, workshop);
 }
 
-export const analyzeWorkshopPage = (html: string, base: WORKSHOP_BASE) => {
+export const analyzeWorkshopPage = (html: string, base: WORKSHOP) => {
     const data: WORKSHOP_ITEM = {
         sections: [],
         warnings: [],
@@ -23,142 +27,90 @@ export const analyzeWorkshopPage = (html: string, base: WORKSHOP_BASE) => {
         id: base.id,
         title: base.title,
     }
-    // const html = command(`curl -s ${url}`);
     var root = HTMLParser.parse(html);
+    const YEAR = '2026';
     // wait till rendered
     const detailsElement = root.querySelector('.iee_organizermain .details');
     const sections  = detailsElement ? detailsElement.querySelectorAll('strong') : [];
+    const eventDate: DATE = {
+        year: YEAR,
+        startTime: '00:00',
+        endTime: '00:00',
+        startDate: '',
+        endDate: ''
+    };
+    data.year = YEAR;
     for (const section of sections) {
-        const sectionTitle = removeHtmlTags(section.text).replace(/:/g, '').toLowerCase().trim();
+        const sectionKey = getKey(section.text);
         let found = false;
         for(const key in IDS) {
-            if (IDS[key].includes(sectionTitle)) {
+            if (IDS[key].includes(sectionKey)) {
                 found = true;
-                data.sections.push(sectionTitle);
+                data.sections.push(sectionKey);
                 if(found){
                     const valueElement = section.querySelector(' + p, + a');
                     if(!valueElement || !valueElement.text) {
-                        LOG.WARN(`No value found for section: ${sectionTitle}`);
-                        data.warnings.push(`No value found for section: ${sectionTitle}`);
+                        LOG.WARN(`No value found for section: ${sectionKey}`);
+                        data.warnings.push(`No value found for section: ${sectionKey}`);
                         continue;
                     }
                     const value = valueElement.text.trim();
                     switch (key) {
                         case 'date':
-                            // data.date = section.nextSibling ? section.nextSibling.text.trim() : '';
-                            data.startDate = value; // Assuming start date is the same as date
-                            data.endDate = value; // Assuming end date is the same as date
+                            // TODO: evt buggy
+                            const day = new Date(`${value} ${YEAR} 06:00`).toISOString(); // set to 6am as default to avoid wrong day
+                            eventDate.startDate = day;
+                            eventDate.endDate = day;
                             break;
                         case 'time':
                             const timeParts = getDateParts(value);
-                            data.startTime = timeParts.start;
-                            data.endTime = timeParts.end;
-                            break;
-                        case 'start':
-                            const startParts = getDateDetail(value);
-                            data.startDate = startParts.date;
-                            data.startTime = startParts.time;
-                            break;
-                        case 'end':
-                            const endParts = getDateDetail(value);
-                            data.endDate = endParts.date;
-                            data.endTime = endParts.time;
+                            const startTime = getTime(timeParts.start);
+                            const endTime = getTime(timeParts.end);
+                            eventDate.startTime = startTime;
+                            eventDate.endTime = endTime;
                             break;
                         case 'category':
                             data.category = getParts(value, ',');
-                            data.days = getDaysFromCategory(data.category);
-                            data.year = getYearFromCategory(data.category);
-                            if (data.days.length === 0) {
-                                LOG.WARN(`No day found in category: ${value}`);
-                                data.warnings.push(`No day found in category: ${value}`);
-                            }
                             break;
                         case 'tags':
-                            const tagsParts = value ? value.split(',') : [];
-                            data.tags = tagsParts.map((tag: string) => tag.trim());
+                            data.tags = getParts(value, ',')
                             break;
                         case 'register':
-                            data.register = value ? value.trim() : '';
+                            data.register = getStrValue(value);
                             break;
                         case 'organizer':
-                            data.organizer = value ? value.trim() : '';
+                            data.organizer = getStrValue(value);
                             break;
                     }
                 }
             }
         }
+
         if (!found) {
-            data.warnings.push(`Section not found: ${sectionTitle}`);
-            LOG.WARN(`Section not found: ${sectionTitle}`);
+            data.warnings.push(`Section not found: ${sectionKey}`);
+            LOG.WARN(`Section not found: ${sectionKey}`);
         }
     }
     data.images = getImages(root);
+    const dates = getDates(eventDate);
+    data.start = dates.start ? dates.start : '';
+    data.end = dates.end ? dates.end : '';
 
-    const venue = root.querySelector('.iee_organizermain .venue');
-    if (venue) {
-        const venueText = removeHtmlTags(venue.innerHTML).trim();
-        if (venueText) {
-            const venueParts = venueText.split(/\n/);
-            data.venue = venueParts.map(part => part.replace(/\\t/g, '').trim())
-                .filter(part => part.length > 0)
-                .filter(part => part.toLowerCase() !== 'venue');
-        }
-    }
+    data.days = getWeekDays([data.start, data.end]);
+
+    // data.days = getDaysFromCategory(data.category);
+    // data.year = getYearFromCategory(data.category);
+    // if (data.days.length === 0) {
+    //     LOG.WARN(`No day found in category: ${value}`);
+    //     data.warnings.push(`No day found in category: ${value}`);
+    // }
+
+    data.venue = getVenue(root, '.iee_organizermain .venue' )
     data.description = [];
     data.links = [];
-    // TODO
-    const descriptionElements = root.querySelectorAll('.entry-content > div')
-                .filter((el: HTMLElement) => el.innerText.trim().length > 0 )
-                .filter((el: HTMLElement) => !el.classList.contains('iee_event_meta'))
-                .filter((el: HTMLElement) => !el.getAttribute('id')?.startsWith('iee-eventbrite-checkout-widget'));
-    for (const descElement of descriptionElements) {
-        const paragraphs = descElement.querySelectorAll('p');
-        let stop = false;
-        for (const paragraph of paragraphs) {
-            const text = removeHtmlTags(paragraph.innerHTML).trim();
-            const sign = 'Bitte reserviere Dir nur dann einen Platz'
-            if(text.toLowerCase().startsWith(sign.toLowerCase())) {
-                stop = true;
-                break;
-            }
-            const hasLinks = paragraph.querySelectorAll('a');
-            for (const hasLink of hasLinks) {
-                const linkHref = hasLink.getAttribute('href');
-                const linkText = removeHtmlTags(hasLink.innerHTML).trim();
-                data.links.push({
-                    text: linkText,
-                    href: linkHref,
-                });
-                
-            }
-            const phrases = ['veranstaltet von', 'angeleitet von', 'gestaltet von', 'geleitet von'];
-            for(const phrase of phrases) {
-                const regexNames = new RegExp(`${phrase.replace(/\s/g, '\\s')}\\s(.*)$`, 'i');
-                // const regexNames = /(gestaltet|angeleitet)\svon\s(.*)$/;
-                if(text.match(regexNames)){
-                    const m = text.match(regexNames);
-                    if(m && m.length > 1) {
-                        const n = m[1].match(/und/)
-                        if(n && n.length > 0) {
-                            const names = m[1].split('und').map(name => name.trim());
-                            for(const name of names) {
-                                if(name && name !== '') {
-                                    // data.speakers.push(name.replace(/[\.|!]*$/, '').trim());
-                                }
-                            }
-                        } else {
-                            if(m[1] && m[1] !== '') {
-                                // data.speakers.push(m[1].replace(/[\.|!]*$/, '').trim());
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (text && text !== '' && !stop) {
-                data.description.push(text);
-            }
-        }
-    }
+    // TODO: '.entry-content > div > p'
+    data.description = getDescription(root);
+    data.links = getLinks(root);
+    data.speakers = getAuthors(data.description);
     return data;
 }

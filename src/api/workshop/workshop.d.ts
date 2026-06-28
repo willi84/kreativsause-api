@@ -9,10 +9,9 @@ export type WORKSHOP_ITEM = {
     id: string;
     title: string;
     description?: string[];
-    startDate?: string;
-    endDate?: string;
-    startTime?: string;
-    endTime?: string;
+    start?: string;
+    end?: string;
+    year: string;
     slug?: string;
     kosten?: string;
     category: string[];
@@ -28,3 +27,5 @@ export type WORKSHOP_ITEM = {
     images?: string[];
     links?: LINK[];
 }
+
+type WORKSHOP = { href: string, title: string, id: string}

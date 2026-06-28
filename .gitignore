@@ -4,3 +4,4 @@ coverage
 _site
 tmp/
 .vscode/
+workshops.json

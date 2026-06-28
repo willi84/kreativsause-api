@@ -6,9 +6,9 @@ export const IDS: ID_MAP = {
     time: ['time'],
     start: ['start'],
     end: ['end'],
-    category: ['event category'],
-    tags: ['event tags'],
-    register: ['click to register'],
+    category: ['event_category'],
+    tags: ['event_tags'],
+    register: ['click_to_register'],
     organizer: ['organizer'],
 };
 

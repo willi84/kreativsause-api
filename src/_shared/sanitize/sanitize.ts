@@ -10,3 +10,18 @@ export const removeHtmlTags = (htmlString: string) => {
     }
     return htmlString.replace(/<[^>]*>/g, '');
 }
+
+export const getKey = (text: string) => {
+    return removeHtmlTags(text)
+        .replace(/:/g, '')
+        .toLowerCase().trim()
+        .replace(/\s/g, '_'); // important: after trim()
+}
+export const getStrValue = (value: string | undefined) => {
+    return value ? value.trim() : '';
+}
+export const sanitizeText = (text: string) => {
+    return removeHtmlTags(text)
+            .replace(/\n/g, '').trim()
+            .replace(/\t/g, '').trim()
+}
