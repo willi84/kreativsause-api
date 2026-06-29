@@ -9,4 +9,4 @@
 export type Filetype = 'file' | 'folder' | 'symlink' | 'other';
 export type FileItem = { type: Filetype; path: string };
 export type FileItems = FileItem[];
-export type $FileResult = string | object | undefined
+export type $FileResult = string | object | undefined;

@@ -1,6 +1,5 @@
 import type { ID_MAP } from './workshop.d';
 
-
 export const IDS: ID_MAP = {
     date: ['date'],
     time: ['time'],
@@ -14,8 +13,8 @@ export const IDS: ID_MAP = {
 
 export const getDays = (): string[] => {
     return Array.from({ length: 7 }, (_, i) =>
-    new Intl.DateTimeFormat("de-DE", { weekday: "long" })
-        .format(new Date(2024, 0, 1 + i))
-        .toLowerCase(),
+        new Intl.DateTimeFormat('de-DE', { weekday: 'long' })
+            .format(new Date(2024, 0, 1 + i))
+            .toLowerCase()
     );
-}
+};

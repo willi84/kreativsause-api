@@ -4,9 +4,9 @@ export const command = (command: string, doLog = false, showError = false) => {
     let output: string = '';
     let errorText: string = '';
     try {
-        output = execSync(`${command}`, { 
+        output = execSync(`${command}`, {
             timeout: 50000,
-            maxBuffer: 150 * 1024 * 1024 
+            maxBuffer: 150 * 1024 * 1024,
         }); // 10000
     } catch (e: any) {
         errorText = e;

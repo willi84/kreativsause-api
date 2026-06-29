@@ -17,7 +17,7 @@ describe('getKey()', () => {
         expect(FN('Date:')).toEqual('date');
         expect(FN(' Time: to')).toEqual('time_to');
         expect(FN(' <p>Time:</p> to')).toEqual('time_to');
-    })
+    });
 });
 describe('getStrValue()', () => {
     const FN = getStrValue;

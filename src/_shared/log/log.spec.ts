@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import { LOG, } from './log';
+import { LOG } from './log';
 import type { COLOR_SET, LogOpts } from './log.d';
 import { colors } from './colors';
 import * as readline from 'readline';

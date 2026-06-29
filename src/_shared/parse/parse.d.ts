@@ -4,4 +4,4 @@ export type DATE = {
     endTime: string;
     startDate: string;
     endDate: string;
-}
+};

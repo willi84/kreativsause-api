@@ -1,10 +1,10 @@
 export type ID_MAP = {
     [key: string]: ID_LIST;
-}
+};
 export type WORKSHOP_BASE = {
     id: string;
     title: string;
-}
+};
 export type WORKSHOP_ITEM = {
     id: string;
     title: string;
@@ -26,6 +26,6 @@ export type WORKSHOP_ITEM = {
     year?: string;
     images?: string[];
     links?: LINK[];
-}
+};
 
-type WORKSHOP = { href: string, title: string, id: string}
+type WORKSHOP = { href: string; title: string; id: string };

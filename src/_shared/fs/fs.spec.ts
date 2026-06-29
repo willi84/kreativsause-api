@@ -247,7 +247,9 @@ describe('CLASS: FS', () => {
             const content = FN('tmp/notexists.txt');
             expect(content).toEqual(undefined);
             expect(spyLog).toHaveBeenCalledWith(
-                expect.stringContaining("readFile: Error: ENOENT, no such file or directory 'tmp/notexists.txt'")
+                expect.stringContaining(
+                    "readFile: Error: ENOENT, no such file or directory 'tmp/notexists.txt'"
+                )
             );
             spyLog.mockRestore();
         });

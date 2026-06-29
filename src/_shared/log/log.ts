@@ -2,7 +2,6 @@ import { colors } from './colors';
 import type { COLOR_SET, LogOpts, LogItem } from './log.d';
 import { COLOR_SETS, LogType } from './log.config';
 
-
 const getColorSet = (type: LogType): COLOR_SET => {
     const resolvedType = type as keyof typeof COLOR_SETS;
     const colorSet: COLOR_SET = COLOR_SETS[resolvedType] as COLOR_SET;

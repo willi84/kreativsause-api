@@ -1,4 +1,3 @@
-
 import { colors } from './colors';
 import type { COLOR_SET_ITEMS } from './log.d';
 
@@ -25,5 +24,9 @@ export const COLOR_SETS: COLOR_SET_ITEMS = {
     },
     [LogType.INLINE]: { id: 'INLINE', fg: colors.FgWhite, bg: colors.BgBlack },
     [LogType.DEBUG]: { id: 'DEBUG', fg: colors.FgBlack, bg: colors.BgWhite },
-    [LogType.NEWLINE]: { id: 'NEWLINE', fg: colors.FgWhite, bg: colors.BgBlack },
+    [LogType.NEWLINE]: {
+        id: 'NEWLINE',
+        fg: colors.FgWhite,
+        bg: colors.BgBlack,
+    },
 };

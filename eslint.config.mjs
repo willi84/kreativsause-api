@@ -8,6 +8,12 @@ import parserTS from '@typescript-eslint/parser';
  */
 export default [
     {
+        ignores: [
+          'coverage/**',
+          'node_modules/**'
+        ],
+    },
+    {
         files: ['**/*.ts'],
         languageOptions: {
             parser: parserTS,

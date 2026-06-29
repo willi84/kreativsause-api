@@ -1,5 +1,15 @@
 import { getKey } from '../sanitize/sanitize';
-import { getImages, getDateParts, getParts, getDaysFromCategory, getYearFromCategory, getDescription, getAuthors, getTime, getVenue } from './parse';
+import {
+    getImages,
+    getDateParts,
+    getParts,
+    getDaysFromCategory,
+    getYearFromCategory,
+    getDescription,
+    getAuthors,
+    getTime,
+    getVenue,
+} from './parse';
 
 describe('getDateParts()', () => {
     const FN = getDateParts;
@@ -11,7 +21,6 @@ describe('getDateParts()', () => {
         expect(FN(`${start}`)).toEqual({ start, end: '' });
         expect(FN(` - ${end}`)).toEqual({ start: '', end });
         expect(FN(``)).toEqual({ start: '', end: '' });
-
     });
 });
 describe('getImages()', () => {
@@ -19,10 +28,13 @@ describe('getImages()', () => {
     it('should return image srcs', () => {
         const html = `
             <div>
-                <img src="image1.jpg" />
-                <img src="image2.jpg" />
-                <img src="image3.jpg" />
+                <article>
+                    <img src="image1.jpg" />
+                    <img src="image2.jpg" />
+                    <img src="image3.jpg" />
+                </article>
             </div>
+                <img src="image4.jpg" />
         `;
         const root = document.createElement('div');
         root.innerHTML = html;
@@ -45,7 +57,11 @@ describe('getParts()', () => {
         const value = 'part1, part2, part3';
         const delimiter = ',';
         expect(FN(value, delimiter)).toEqual(['part1', 'part2', 'part3']);
-        expect(FN(` ${value} `, delimiter)).toEqual(['part1', 'part2', 'part3']);
+        expect(FN(` ${value} `, delimiter)).toEqual([
+            'part1',
+            'part2',
+            'part3',
+        ]);
         expect(FN(``, delimiter)).toEqual([]);
     });
 });
@@ -92,7 +108,7 @@ describe('getDescription()', () => {
         expect(result).toEqual([
             'Ich bin ein Text',
             'Ich bin ein weiterer Text',
-            'Der Workshop wird veranstaltet von Robert Willemelis'
+            'Der Workshop wird veranstaltet von Robert Willemelis',
         ]);
     });
 });
@@ -104,25 +120,33 @@ describe('getAuthors()', () => {
             'Veranstaltet von Robert Willemelis',
             'Angeleitet von Max Mustermann',
             'Gestaltet von John Doe',
-            'Geleitet von Jane Doe'
+            'Geleitet von Jane Doe',
         ];
-        expect(FN(['Angeleitet von Max Mustermann'])).toEqual(['Max Mustermann']);
+        expect(FN(['Angeleitet von Max Mustermann'])).toEqual([
+            'Max Mustermann',
+        ]);
         expect(FN(['Gestaltet von John Doe'])).toEqual(['John Doe']);
-        expect(FN(['Gestaltet von John Doe und Jane Doe'])).toEqual(['John Doe', 'Jane Doe']);
+        expect(FN(['Gestaltet von John Doe und Jane Doe'])).toEqual([
+            'John Doe',
+            'Jane Doe',
+        ]);
         expect(FN(['Geleitet von Jane Doe'])).toEqual(['Jane Doe']);
         expect(FN(['Keine Angabe'])).toEqual([]);
-        expect(FN(items)).toEqual(['Robert Willemelis', 'Max Mustermann', 'John Doe', 'Jane Doe']);
+        expect(FN(items)).toEqual([
+            'Robert Willemelis',
+            'Max Mustermann',
+            'John Doe',
+            'Jane Doe',
+        ]);
     });
 });
 describe('getKey()', () => {
     const FN = getKey;
     it('should return key from text', () => {
-        const text = 'Veranstaltet von Robert Willemelis';
         expect(FN('heute: ein Key ')).toEqual('heute_ein_key');
         expect(FN('<p>heute:</p> ein Key ')).toEqual('heute_ein_key');
-
     });
-})
+});
 describe('getTime()', () => {
     const FN = getTime;
     it('should return time in 24h format', () => {
@@ -140,7 +164,8 @@ describe('getVenue()', () => {
     const FN = getVenue;
     it('should return venue details', () => {
         const location = 'COCONAT - a workation retreat im Gutshof Glien';
-        const address = 'Klein-Glien 25, 14806 Bad BelzigBad Belzig, BB, DE, 14806'
+        const address =
+            'Klein-Glien 25, 14806 Bad BelzigBad Belzig, BB, DE, 14806';
         const html = `
             <div class="venue">
                 <p>${location}</p>
