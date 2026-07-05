@@ -21,7 +21,7 @@ export const getWorkshopLinks = () => {
     };
     const html = command(`curl -s ${url}`);
     if (html.length < 10) {
-        LOG.FAIL('could not reach program page')
+        LOG.FAIL('could not reach program page');
     } else {
         LOG.OK('start parsing workshops');
         const root = HTMLParser.parse(html);
