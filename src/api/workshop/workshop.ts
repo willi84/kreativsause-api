@@ -133,7 +133,27 @@ export const analyzeWorkshopPage = (html: string, base: WORKSHOP) => {
                             break;
                         case 'tags':
                             const parts = getParts(value, ',');
-                            data.tags = getTags(parts);
+                            const tags = getTags(parts);
+                            data.audience = [];
+                            data.bilingual = false;
+                            data.tags = [];
+                            for (const tag of tags) {
+                                if (tag === 'mensch') {
+                                    // do nothing
+                                } else if (
+                                    tag.match(/kinder|jugendliche|erwachsene/i)
+                                ) {
+                                    if (!data.audience.includes(tag)) {
+                                        data.audience.push(tag);
+                                    }
+                                } else if (tag === 'bilingual') {
+                                    data.bilingual = true;
+                                } else {
+                                    if (!data.tags.includes(tag)) {
+                                        data.tags.push(tag);
+                                    }
+                                }
+                            }
                             break;
                         case 'register':
                             data.register = getStrValue(value);
@@ -173,13 +193,6 @@ export const analyzeWorkshopPage = (html: string, base: WORKSHOP) => {
     data.end = dates.end ? dates.end : '';
 
     data.days = getWeekDays([data.start, data.end]);
-
-    // data.days = getDaysFromCategory(data.category);
-    // data.year = getYearFromCategory(data.category);
-    // if (data.days.length === 0) {
-    //     LOG.WARN(`No day found in category: ${value}`);
-    //     data.warnings.push(`No day found in category: ${value}`);
-    // }
 
     data.venue = getVenue(root, '.iee_organizermain .venue');
     data.description = [];

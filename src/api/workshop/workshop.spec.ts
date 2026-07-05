@@ -67,15 +67,16 @@ describe('analyzeWorkshopPage()', () => {
             days: ['montag'],
             year: '2026',
             tags: [
-                'erwachsene',
                 'gesellschaft',
                 'teilhabe',
-                'mensch',
+                // 'mensch',
                 'natur',
                 'nachhaltigkeit',
                 'neues arbeiten',
                 'leben',
             ],
+            audience: ['erwachsene'],
+            bilingual: false,
             register:
                 'https://www.eventbrite.de/e/kleine-stupser-groe-wirkung-durch-green-nudging-registrierung-1990561749778',
             images: [
