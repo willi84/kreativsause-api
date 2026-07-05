@@ -40,6 +40,21 @@ describe('getImages()', () => {
         root.innerHTML = html;
         expect(FN(root)).toEqual(['image1.jpg', 'image2.jpg', 'image3.jpg']);
     });
+    it('should return image srcs', () => {
+        const html = `
+            <div>
+                <div class="site-content">
+                    <img src="image1.jpg" />
+                    <img src="image2.jpg" />
+                    <img src="image3.jpg" />
+                </div>
+            </div>
+                <img src="image4.jpg" />
+        `;
+        const root = document.createElement('div');
+        root.innerHTML = html;
+        expect(FN(root)).toEqual(['image1.jpg', 'image2.jpg', 'image3.jpg']);
+    });
     it('should return empty array if no images', () => {
         const html = `
             <div>
@@ -100,6 +115,31 @@ describe('getDescription()', () => {
         <p> Der Workshop wird veranstaltet von Robert Willemelis</p>
         <p>Bitte reserviere Dir nur dann einen Platz</p>
         <p>DIESER TEXT DARF NICHT ERSCHEINEN</p>
+    </div>`;
+    const root = document.createElement('div');
+    root.innerHTML = html;
+    const result = FN(root);
+    it('should return description paragraphs', () => {
+        expect(result).toEqual([
+            'Ich bin ein Text',
+            'Ich bin ein weiterer Text',
+            'Der Workshop wird veranstaltet von Robert Willemelis',
+        ]);
+    });
+});
+describe('getDescription()', () => {
+    const FN = getDescription;
+    const html = `<div class="site-content">
+    <div class="ast-container">
+            <p>Ich bin ein Text</p>
+            <p> </p>
+            <p>Ich bin ein weiterer Text</p>
+            <p class="iee_event_meta">Ich bin ein Meta-Text</p>
+            <p class="iee_event_image">Ich bin ein Bild-Text</p>
+            <p> Der Workshop wird veranstaltet von Robert Willemelis</p>
+            <p>Bitte reserviere Dir nur dann einen Platz</p>
+            <p>DIESER TEXT DARF NICHT ERSCHEINEN</p>
+        </div>
     </div>`;
     const root = document.createElement('div');
     root.innerHTML = html;

@@ -23,7 +23,11 @@ export const getWorkshopDetails = (
     id: number,
     all: number
 ) => {
-    const url = workshop.href;
+    // if(!workshop){
+    //     LOG.WARN(`[workshop ${id}] is undefined `);
+
+    // }
+    const url = workshop?.href;
     const html = command(`curl -s ${url}`);
     if (html.length > 10) {
         LOG.OK(`[${id}/${all}] ${url}`);
@@ -116,6 +120,22 @@ export const analyzeWorkshopPage = (html: string, base: WORKSHOP) => {
         }
     }
     data.images = getImages(root);
+    const blacklist = [
+        'https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F758909869%2F317817383889%2F1%2Foriginal.20240503-144830?h=740&w=1200&auto=format%2Ccompress&q=75&sharp=10&s=56886f368d922258e2acb40e3ecf2465',
+        'https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F758910769%2F317817383889%2F1%2Foriginal.20240503-144938?h=740&w=1200&auto=format%2Ccompress&q=75&sharp=10&s=02292ac7a7ba780f28803a6946753e43',
+    ];
+
+    data.speaker_image = '';
+    const filteredImages = data.images.filter(
+        (image) =>
+            image.startsWith('https://img.evbuc.com') &&
+            blacklist.indexOf(image) === -1
+    );
+    for (const image of filteredImages) {
+        data.speaker_image = image;
+        break;
+    }
+
     const dates = getDates(eventDate);
     data.start = dates.start ? dates.start : '';
     data.end = dates.end ? dates.end : '';
@@ -136,6 +156,8 @@ export const analyzeWorkshopPage = (html: string, base: WORKSHOP) => {
     data.description = getDescription(root);
     if (data.description.length === 0) {
         data.warnings.push('no description found');
+    } else {
+        LOG.OK(`description found with ${data.description.length} paragraphs`);
     }
     data.links = getLinks(root);
     data.speakers = getAuthors(data.description);

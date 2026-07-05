@@ -14,6 +14,8 @@ describe('analyzeWorkshopPage()', () => {
             ],
             warnings: [],
             speakers: ['´Zukunftszentrum Brandenburg'], // TODO: richtig?
+            speaker_image:
+                'https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1186138027%2F466620722581%2F1%2Foriginal.20260604-092030?h=740&w=1200&auto=format%2Ccompress&q=75&sharp=10&s=b6eaf4b2a3fb8a83c2bd6e291c75c043',
             category: ['Montag 2026', 'Veranstaltungstag 2026'],
             id: 'sample',
             title: 'sampleTitle',

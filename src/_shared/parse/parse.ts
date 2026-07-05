@@ -23,7 +23,7 @@ export const getDateParts = (value: string) => {
 };
 
 export const getImages = (root: HTMLElement) => {
-    const images = root.querySelectorAll('article img');
+    const images = root.querySelectorAll('article img, .site-content img');
     const result = [];
     for (const image of images) {
         const src = image.getAttribute('src');
@@ -58,7 +58,7 @@ export const getYearFromCategory = (category: string[]) => {
 
 export const getParagrafs = (root: HTMLElement) => {
     const pars = root.querySelectorAll<PARAGRAF>(
-        '.entry-content > p, .site-content p'
+        '.entry-content > p, .site-content .ast-container > p'
     );
     const paragraphs = Array.from(pars)
         .filter((el: PARAGRAF) => !el.classList.contains('iee_event_meta'))

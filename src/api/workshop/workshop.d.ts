@@ -22,6 +22,7 @@ export type WORKSHOP_ITEM = {
     sections: string[];
     warnings: string[];
     speakers: string[];
+    speaker_image?: string;
     days?: string[];
     year?: string;
     images?: string[];
