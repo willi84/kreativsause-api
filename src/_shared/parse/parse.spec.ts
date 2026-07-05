@@ -109,6 +109,7 @@ describe('getDescription()', () => {
     const html = `<div class="entry-content">
         <p>Ich bin ein Text</p>
         <p> </p>
+        <p>Ich bin ein Text  </p>
         <p>Ich bin ein weiterer Text</p>
         <p class="iee_event_meta">Ich bin ein Meta-Text</p>
         <p class="iee_event_image">Ich bin ein Bild-Text</p>

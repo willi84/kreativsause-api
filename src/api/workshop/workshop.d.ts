@@ -5,6 +5,10 @@ export type WORKSHOP_BASE = {
     id: string;
     title: string;
 };
+
+export type MAP = {
+    [key: string]: number;
+};
 export type WORKSHOP_ITEM = {
     id: string;
     title: string;

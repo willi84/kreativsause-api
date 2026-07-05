@@ -1,5 +1,23 @@
 import { FS } from './../../_shared/fs/fs';
-import { analyzeWorkshopPage, getTags } from './workshop';
+import type { MAP } from './workshop.d';
+import { analyzeWorkshopPage, collectItems, getTags } from './workshop';
+
+describe('collectItems()', () => {
+    const FN = collectItems;
+    it('should collect items', () => {
+        const target: MAP = {};
+        const EXPECTED = {
+            foo: 3,
+            bar: 2,
+            lorem: 1,
+            ipsum: 1,
+        };
+        FN(['foo', 'bar', 'lorem'], target);
+        FN(['foo', 'bar', 'ipsum'], target);
+        FN(['foo'], target);
+        expect(target).toEqual(EXPECTED);
+    });
+});
 
 describe('getTags()', () => {
     const FN = getTags;
@@ -73,7 +91,7 @@ describe('analyzeWorkshopPage()', () => {
             ],
             description: [
                 'Mit dem Zukunftszentrum Brandenburg Ideen für nachhaltiges Verhalten entwickeln',
-                'Mit dem Zukunftszentrum Brandenburg Ideen für nachhaltiges Verhalten entwickeln',
+                // 'Mit dem Zukunftszentrum Brandenburg Ideen für nachhaltiges Verhalten entwickeln',
                 'Wie können wir nachhaltiges Verhalten einfacher, attraktiver und selbstverständlicher machen?',
                 'Genau hier setzt Green Nudging an, ein Ansatz aus der Verhaltenswissenschaft, der dabei hilft, umweltfreundliche Entscheidungen gezielt zu unterstützen.',
                 'In diesem Workshop wirst du selbst zur Gestalter*in! Gemeinsam mit anderen Teilnehmenden entwickelst du kreative Green Nudges, die Menschen im Alltag zu nachhaltigeren Entscheidungen anregen. Ob im Supermarkt, im Büro oder im öffentlichen Raum, es entstehen praxisnahe Ideen, die sich direkt auf reale Situationen übertragen lassen.',

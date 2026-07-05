@@ -1,5 +1,5 @@
 import { LOG } from './../../_shared/log/log';
-import type { WORKSHOP, WORKSHOP_ITEM } from './workshop.d';
+import type { MAP, WORKSHOP, WORKSHOP_ITEM } from './workshop.d';
 import { command } from '../../_shared/cmd/cmd';
 import { getKey, getStrValue } from '../../_shared/sanitize/sanitize';
 import { IDS } from './workshop.config';
@@ -17,6 +17,20 @@ import {
     getWeekDays,
 } from '../../_shared/parse/parse';
 const HTMLParser = require('node-html-parser');
+
+export const collectItems = (
+    list: string[] | null | undefined,
+    target: MAP
+) => {
+    if (list && list.length > 0) {
+        for (const item of list) {
+            if (!target[item]) {
+                target[item] = 0;
+            }
+            target[item]++;
+        }
+    }
+};
 
 export const getTags = (tags: string[]) => {
     const result: string[] = [];

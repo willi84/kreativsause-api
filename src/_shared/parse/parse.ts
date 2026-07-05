@@ -87,11 +87,13 @@ export const getParagrafs = (root: HTMLElement) => {
 };
 
 export const getDescription = (root: HTMLElement) => {
-    const result = getParagrafs(root)
-        .map((paragraph: PARAGRAF) =>
-            removeHtmlTags(paragraph.innerHTML).trim()
-        )
-        .filter((text: string) => text.trim() !== '');
+    const result = [];
+    for (const paragraf of getParagrafs(root)) {
+        const text = removeHtmlTags(paragraf.innerHTML).trim();
+        if (text.length > 0 && result.indexOf(text) === -1) {
+            result.push(text);
+        }
+    }
     return result;
 };
 export const getLinks = (root: HTMLElement) => {

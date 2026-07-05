@@ -1,6 +1,7 @@
 import type { WORKSHOP_ITEM } from './workshop/workshop.d';
 export type ALL_DATA = {
     generated: string;
+    meta: any;
     workshops: {
         [key: string]: WORKSHOP_ITEM;
     };

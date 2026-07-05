@@ -3,7 +3,7 @@ import { FS } from '../_shared/fs/fs';
 import { LOG } from '../_shared/log/log';
 import { getKey } from '../_shared/sanitize/sanitize';
 import { lintData } from './linting/linting';
-import { getWorkshopDetails } from './workshop/workshop';
+import { collectItems, getWorkshopDetails } from './workshop/workshop';
 import type { ALL_DATA, WORKSHOP } from './api.d';
 import { IS_DEV, MAX, START } from './api.config';
 
@@ -17,6 +17,10 @@ export const getWorkshopLinks = () => {
     const url = 'https://flaeminger.kreativsause.de/programm-2026/';
     const data: ALL_DATA = {
         generated: new Date().toISOString(),
+        meta: {
+            tags: {},
+            categories: {},
+        },
         workshops: {},
     };
     const html = command(`curl -s ${url}`);
@@ -45,6 +49,15 @@ export const getWorkshopLinks = () => {
             const workshop = workshops[i];
             const id = i + 1;
             const details = getWorkshopDetails(workshop, id, max);
+
+            // get Tags
+            collectItems(details.tags, data.meta.tags);
+            collectItems(details.category, data.meta.categories);
+            collectItems(details.images, data.meta.images);
+            collectItems(details.speakers, data.meta.speakers);
+            const links = details.links?.map((link) => link.href);
+            collectItems(links, data.meta.links);
+
             LOG.DEBUG(JSON.stringify(workshop));
             const noDuplicate = !data.workshops[workshop.id];
             if (!noDuplicate) {
