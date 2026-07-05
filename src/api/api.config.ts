@@ -5,6 +5,6 @@ export const PHRASES = [
     'geleitet von',
 ];
 
-export const IS_DEV = true;
+export const IS_DEV = false;
 export const START = IS_DEV ? 10 : 0;
 export const MAX = 20; // -1
