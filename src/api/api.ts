@@ -20,6 +20,9 @@ export const getWorkshopLinks = () => {
         meta: {
             tags: {},
             categories: {},
+            images: {},
+            speakers: {},
+            links: {},
         },
         workshops: {},
     };
