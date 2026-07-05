@@ -57,7 +57,9 @@ export const getYearFromCategory = (category: string[]) => {
 };
 
 export const getParagrafs = (root: HTMLElement) => {
-    const pars = root.querySelectorAll<PARAGRAF>('.entry-content > p');
+    const pars = root.querySelectorAll<PARAGRAF>(
+        '.entry-content > p, .site-content p'
+    );
     const paragraphs = Array.from(pars)
         .filter((el: PARAGRAF) => !el.classList.contains('iee_event_meta'))
         .filter((el: PARAGRAF) => !el.classList.contains('iee_event_image'))

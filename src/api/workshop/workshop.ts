@@ -134,6 +134,9 @@ export const analyzeWorkshopPage = (html: string, base: WORKSHOP) => {
     data.links = [];
     // TODO: '.entry-content > div > p'
     data.description = getDescription(root);
+    if (data.description.length === 0) {
+        data.warnings.push('no description found');
+    }
     data.links = getLinks(root);
     data.speakers = getAuthors(data.description);
     return data;
