@@ -18,6 +18,23 @@ import {
 } from '../../_shared/parse/parse';
 const HTMLParser = require('node-html-parser');
 
+export const getTags = (tags: string[]) => {
+    const result: string[] = [];
+    for (const tag of tags) {
+        const uSplit = tag.split(/\sund\s/);
+        for (const uPart of uSplit) {
+            const splitted = uPart.split(/[,&]/);
+            for (const part of splitted) {
+                const str = part.toLowerCase().trim();
+                if (!result.includes(str) && str.length > 0) {
+                    result.push(str);
+                }
+            }
+        }
+    }
+    return result;
+};
+
 export const getWorkshopDetails = (
     workshop: WORKSHOP,
     id: number,
@@ -101,7 +118,8 @@ export const analyzeWorkshopPage = (html: string, base: WORKSHOP) => {
                             data.category = getParts(value, ',');
                             break;
                         case 'tags':
-                            data.tags = getParts(value, ',');
+                            const parts = getParts(value, ',');
+                            data.tags = getTags(parts);
                             break;
                         case 'register':
                             data.register = getStrValue(value);

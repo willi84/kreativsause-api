@@ -1,5 +1,30 @@
 import { FS } from './../../_shared/fs/fs';
-import { analyzeWorkshopPage } from './workshop';
+import { analyzeWorkshopPage, getTags } from './workshop';
+
+describe('getTags()', () => {
+    const FN = getTags;
+    it('should return tags', () => {
+        const result = FN([
+            'Erwachsene, Gesellschaft und Teilhabe',
+            'Mensch',
+            'Natur & Gesellschaft',
+            'Nachhaltigkeit',
+            'Neues Arbeiten und Leben',
+            'Leben',
+        ]);
+        expect(result).toEqual([
+            'erwachsene',
+            'gesellschaft',
+            'teilhabe',
+            'mensch',
+            'natur',
+            'nachhaltigkeit',
+            'neues arbeiten',
+            'leben',
+        ]);
+    });
+});
+
 describe('analyzeWorkshopPage()', () => {
     const FN = analyzeWorkshopPage;
     it('should return workshop details', () => {
@@ -24,12 +49,14 @@ describe('analyzeWorkshopPage()', () => {
             days: ['montag'],
             year: '2026',
             tags: [
-                'Erwachsene',
-                'Gesellschaft und Teilhabe',
-                'Mensch & Gesellschaft',
-                'Mensch & Natur',
-                'Nachhaltigkeit',
-                'Neues Arbeiten und Leben',
+                'erwachsene',
+                'gesellschaft',
+                'teilhabe',
+                'mensch',
+                'natur',
+                'nachhaltigkeit',
+                'neues arbeiten',
+                'leben',
             ],
             register:
                 'https://www.eventbrite.de/e/kleine-stupser-groe-wirkung-durch-green-nudging-registrierung-1990561749778',
