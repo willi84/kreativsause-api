@@ -30,7 +30,6 @@ export const getWorkshopLocations = () => {
         }
         index++;
     }
-    console.log(result);
     return result;
 };
 
@@ -39,9 +38,7 @@ export const main = () => {
     getWorkshopLinks(locations);
 };
 export const getList = (value: string) => {
-    const list = (value || '')
-        .split(',')
-        .map((item: string) => item.trim());
+    const list = (value || '').split(',').map((item: string) => item.trim());
     return list;
 };
 
