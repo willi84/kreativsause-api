@@ -65,7 +65,9 @@ export const getWorkshopDetails = (
     } else {
         LOG.FAIL(`[${id}/${all}] ${url}`);
     }
-    return analyzeWorkshopPage(html, workshop);
+    const result = analyzeWorkshopPage(html, workshop);
+    result['source'] = url;
+    return result;
 };
 
 export const analyzeWorkshopPage = (html: string, base: WORKSHOP) => {

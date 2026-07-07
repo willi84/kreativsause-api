@@ -52,7 +52,7 @@ export const getWorkshopLinks = () => {
             const workshop = workshops[i];
             const id = i + 1;
             const details = getWorkshopDetails(workshop, id, max);
-            details['source'] = workshop['source'];
+            // details['source'] = workshop['source'];
 
             // get Tags
             collectItems(details.tags, data.meta.tags);
