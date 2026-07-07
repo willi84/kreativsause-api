@@ -19,6 +19,7 @@ export type WORKSHOP_ITEM = {
     slug?: string;
     kosten?: string;
     audience?: string[];
+    changes?: string[];
     bilingual?: boolean;
     category: string[];
     tags?: string[];

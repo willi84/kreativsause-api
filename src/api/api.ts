@@ -30,6 +30,7 @@ export const getWorkshopLocations = () => {
         }
         index++;
     }
+    console.log(result);
     return result;
 };
 
@@ -37,8 +38,14 @@ export const main = () => {
     const locations = getWorkshopLocations();
     getWorkshopLinks(locations);
 };
+export const getList = (value: string) => {
+    const list = (value || '')
+        .split(',')
+        .map((item: string) => item.trim());
+    return list;
+};
 
-export const getWorkshopLinks = (locations: any) => {
+export const getWorkshopLinks = (manualData: any) => {
     const workshops: WORKSHOP[] = [];
     const url = 'https://flaeminger.kreativsause.de/programm-2026/';
     const data: ALL_DATA = {
@@ -78,10 +85,14 @@ export const getWorkshopLinks = (locations: any) => {
             const workshop = workshops[i];
             const id = i + 1;
             const details = getWorkshopDetails(workshop, id, max);
-            if (locations[details.id]) {
-                details.venue = locations[details.id].location
-                    .split(',')
-                    .map((item: string) => item.trim());
+            const dataItem = manualData[details.id];
+            if (dataItem) {
+                details.venue = getList(dataItem.location);
+                const filterOut = ['active'];
+                const logs = getList(dataItem.status).filter(
+                    (item: string) => !filterOut.includes(item)
+                );
+                details.changes = logs;
             }
             // details['source'] = workshop['source'];
 
