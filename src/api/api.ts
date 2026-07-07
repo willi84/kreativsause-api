@@ -5,14 +5,40 @@ import { getKey } from '../_shared/sanitize/sanitize';
 import { lintData } from './linting/linting';
 import { collectItems, getWorkshopDetails } from './workshop/workshop';
 import type { ALL_DATA, WORKSHOP } from './api.d';
-import { IS_DEV, MAX, START } from './api.config';
+import { IS_DEV, MAX, SHEET_ID, SHEET_TAB, START } from './api.config';
+import { getSheetData, rowToValues } from '../_shared/google/google';
 
 const HTMLParser = require('node-html-parser');
-export const main = () => {
-    getWorkshopLinks();
+
+export const getWorkshopLocations = () => {
+    const sheetJson = getSheetData(SHEET_ID, SHEET_TAB);
+    // console.log(sheetJson);
+
+    const rows = sheetJson.table.rows;
+
+    const keys = rows[0].c.map((col: any) => col.v);
+    const result: any = {};
+    let index = 0;
+    for (const row of rows) {
+        if (index > 0) {
+            const values = rowToValues(row);
+            const item: any = {};
+            for (const key of keys) {
+                item[key] = values[keys.indexOf(key)];
+            }
+            result[item.id] = item;
+        }
+        index++;
+    }
+    return result;
 };
 
-export const getWorkshopLinks = () => {
+export const main = () => {
+    const locations = getWorkshopLocations();
+    getWorkshopLinks(locations);
+};
+
+export const getWorkshopLinks = (locations: any) => {
     const workshops: WORKSHOP[] = [];
     const url = 'https://flaeminger.kreativsause.de/programm-2026/';
     const data: ALL_DATA = {
@@ -52,6 +78,11 @@ export const getWorkshopLinks = () => {
             const workshop = workshops[i];
             const id = i + 1;
             const details = getWorkshopDetails(workshop, id, max);
+            if (locations[details.id]) {
+                details.venue = locations[details.id].location
+                    .split(',')
+                    .map((item: string) => item.trim());
+            }
             // details['source'] = workshop['source'];
 
             // get Tags

@@ -6,3 +6,4 @@ tmp/
 .vscode/
 workshops.json
 src/_data/workshops.json
+IS_DEV
