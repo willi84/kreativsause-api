@@ -22,6 +22,7 @@ export type WORKSHOP_ITEM = {
     bilingual?: boolean;
     category: string[];
     tags?: string[];
+    source?: string;
     register?: string;
     organizer?: string;
     venue?: string[];

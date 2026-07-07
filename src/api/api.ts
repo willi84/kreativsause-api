@@ -40,7 +40,7 @@ export const getWorkshopLinks = () => {
                 .split('/')
                 .filter((item: string) => item.trim() !== '');
             const id = getKey(urlItems[urlItems.length - 1]);
-            const workshop = { href, title, id };
+            const workshop = { href, title, id, source: url };
             const str = title.toLowerCase().trim();
             if (str.indexOf('mehr...') !== -1 || str === '') {
             } else if (workshops.indexOf(workshop) === -1) {
@@ -52,6 +52,7 @@ export const getWorkshopLinks = () => {
             const workshop = workshops[i];
             const id = i + 1;
             const details = getWorkshopDetails(workshop, id, max);
+            details['source'] = workshop['source'];
 
             // get Tags
             collectItems(details.tags, data.meta.tags);
