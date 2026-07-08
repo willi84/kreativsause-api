@@ -5,13 +5,32 @@ import { getKey } from '../_shared/sanitize/sanitize';
 import { lintData } from './linting/linting';
 import { collectItems, getWorkshopDetails } from './workshop/workshop';
 import type { ALL_DATA, WORKSHOP } from './api.d';
-import { IS_DEV, MAX, SHEET_ID, SHEET_TAB, START } from './api.config';
+import type { WORKSHOP_ITEM } from './workshop/workshop.d';
+import {
+    IS_DEV,
+    MAX,
+    SHEET_ID,
+    SHEET_TAB,
+    SHEET_TAB_2,
+    START,
+} from './api.config';
 import { getSheetData, rowToValues } from '../_shared/google/google';
 
 const HTMLParser = require('node-html-parser');
 
-export const getWorkshopLocations = () => {
-    const sheetJson = getSheetData(SHEET_ID, SHEET_TAB);
+type EXTRA_EVENT = {
+    id: string;
+    title: string;
+    start: string;
+    end: string;
+    day?: string;
+    status?: string;
+    location?: string;
+    frequency?: string;
+};
+
+export const getData = (id: string, tab: string) => {
+    const sheetJson = getSheetData(id, tab);
     // console.log(sheetJson);
 
     const rows = sheetJson.table.rows;
@@ -33,16 +52,130 @@ export const getWorkshopLocations = () => {
     return result;
 };
 
+export const getWorkshopLocations = () => {
+    return getData(SHEET_ID, SHEET_TAB);
+};
+export const getExtraEvents = () => {
+    return getData(SHEET_ID, SHEET_TAB_2);
+};
+
 export const main = () => {
     const locations = getWorkshopLocations();
-    getWorkshopLinks(locations);
+    const events = getExtraEvents();
+    getWorkshopLinks(locations, events);
 };
 export const getList = (value: string) => {
-    const list = (value || '').split(',').map((item: string) => item.trim());
+    const list = (value || '')
+        .split(',')
+        .map((item: string) => item.trim())
+        .filter((item: string) => item !== '');
     return list;
 };
 
-export const getWorkshopLinks = (manualData: any) => {
+export const getEventYear = (start: string, end: string) => {
+    const startYear = new Date(start).getUTCFullYear();
+    const endYear = new Date(end).getUTCFullYear();
+    return `${startYear || endYear || ''}`;
+};
+
+export const getEventDay = (value: string) => {
+    return new Date(value)
+        .toLocaleDateString('de-DE', {
+            weekday: 'long',
+            timeZone: 'UTC',
+        })
+        .toLowerCase();
+};
+
+export const createEventDate = (baseDate: Date, timeDate: Date) => {
+    const result = new Date(baseDate);
+    result.setUTCHours(
+        timeDate.getUTCHours(),
+        timeDate.getUTCMinutes(),
+        timeDate.getUTCSeconds(),
+        timeDate.getUTCMilliseconds()
+    );
+    return result.toISOString();
+};
+
+export const createExtraEventItem = (
+    event: EXTRA_EVENT,
+    start: string,
+    end: string,
+    id = event.id
+): WORKSHOP_ITEM => {
+    const year = getEventYear(start, end);
+    const day = getEventDay(start);
+    const category = [`${day} ${year}`];
+    const changes = getList(event.status || '').filter(
+        (item: string) => item !== 'active'
+    );
+    return {
+        id,
+        title: event.title,
+        start,
+        end,
+        year,
+        category,
+        venue: getList(event.location || ''),
+        changes,
+        sections: ['extra_event'],
+        warnings: [],
+        speaker_image: event.speaker_image || '',
+        speakers: getList(event.speakers || ''),
+        days: [day],
+        description: [],
+        tags: getList(event.tags || ''),
+    };
+};
+
+export const expandExtraEvent = (event: EXTRA_EVENT): WORKSHOP_ITEM[] => {
+    if (!event.start || !event.end || !event.id || !event.title) {
+        return [];
+    }
+    if (event.frequency !== 'daily') {
+        return [createExtraEventItem(event, event.start, event.end)];
+    }
+    const startDate = new Date(event.start);
+    const endDate = new Date(event.end);
+    const currentDate = new Date(
+        Date.UTC(
+            startDate.getUTCFullYear(),
+            startDate.getUTCMonth(),
+            startDate.getUTCDate()
+        )
+    );
+    const lastDate = new Date(
+        Date.UTC(
+            endDate.getUTCFullYear(),
+            endDate.getUTCMonth(),
+            endDate.getUTCDate()
+        )
+    );
+    const result: WORKSHOP_ITEM[] = [];
+    while (currentDate.getTime() <= lastDate.getTime()) {
+        const start = createEventDate(currentDate, startDate);
+        const end = createEventDate(currentDate, endDate);
+        const dateId = currentDate.toISOString().split('T')[0];
+        result.push(
+            createExtraEventItem(event, start, end, `${event.id}-${dateId}`)
+        );
+        currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+    }
+    return result;
+};
+
+export const getExtraEventItems = (
+    extraEvents: Record<string, EXTRA_EVENT>
+) => {
+    const result: WORKSHOP_ITEM[] = [];
+    for (const event of Object.values(extraEvents || {})) {
+        result.push(...expandExtraEvent(event));
+    }
+    return result;
+};
+
+export const getWorkshopLinks = (manualData: any, extraEvents: any) => {
     const workshops: WORKSHOP[] = [];
     const url = 'https://flaeminger.kreativsause.de/programm-2026/';
     const data: ALL_DATA = {
@@ -112,6 +245,15 @@ export const getWorkshopLinks = (manualData: any) => {
             }
         }
     }
-    // console.log(workshops);
+    const extraEventItems = getExtraEventItems(extraEvents);
+    for (const extraEvent of extraEventItems) {
+        const noDuplicate = !data.workshops[extraEvent.id];
+        if (!noDuplicate) {
+            LOG.WARN(`extra event with id ${extraEvent.id} is duplicated`);
+            continue;
+        }
+        lintData(extraEvent);
+        data.workshops[extraEvent.id] = extraEvent;
+    }
     FS.writeFile('./workshops.json', JSON.stringify(data, null, 2));
 };

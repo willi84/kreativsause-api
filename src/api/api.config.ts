@@ -24,3 +24,4 @@ if (IS_DEV) {
 
 export const SHEET_ID = '1GahjRBvg9WIULJSlgj0m9rsgUf0lqXDLlTAX6fy5mA0';
 export const SHEET_TAB = 'WORKSHOPS';
+export const SHEET_TAB_2 = 'EVENTS';
